@@ -1,0 +1,190 @@
+### 全局变量定义
+@baseUrl = http://localhost:8081
+
+#############################################
+### 注意：此文件仅供参考，无法直接运行
+### 请使用以下方法测试上传功能：
+### 1. bash test-upload.sh (自动化脚本)
+### 2. curl 命令
+### 3. Postman
+### 4. 浏览器访问 /upload-test.html
+#############################################
+
+### 以下是 API 接口说明（不能直接运行）
+
+#############################################
+### API 接口说明
+#############################################
+
+### 1. 上传图片
+### POST /upload/image
+### Content-Type: multipart/form-data
+### 参数：file (图片文件)
+### 响应：
+### {
+###   "code": 200,
+###   "data": {
+###     "url": "/uploads/images/xxx.jpg",
+###     "filename": "test.jpg",
+###     "size": "1024"
+###   }
+### }
+
+### 2. 上传文档
+### POST /upload/document
+### Content-Type: multipart/form-data
+### 参数：file (文档文件)
+### 响应：同上
+
+### 3. 上传任意文件
+### POST /upload/file
+### Content-Type: multipart/form-data
+### 参数：file (任意文件)
+### 响应：
+### {
+###   "code": 200,
+###   "data": {
+###     "url": "/uploads/xxx.xxx",
+###     "filename": "test.xxx",
+###     "size": "1024",
+###     "type": "image|document|other"
+###   }
+### }
+
+### 4. 批量上传图片
+### POST /upload/images
+### Content-Type: multipart/form-data
+### 参数：files (多个图片文件)
+### 响应：
+### {
+###   "code": 200,
+###   "data": [
+###     "/uploads/images/1.jpg",
+###     "/uploads/images/2.jpg"
+###   ]
+### }
+
+### 5. 删除文件
+### DELETE /upload/{filename}
+### 示例：DELETE /upload/images/test.jpg
+### 响应：
+### {
+###   "code": 200,
+###   "msg": "删除成功"
+### }
+
+### 6. 访问上传的文件
+### GET /uploads/images/test.jpg
+### 直接在浏览器中打开即可看到图片
+
+#############################################
+### curl 命令测试示例
+#############################################
+
+### 在终端执行以下命令进行测试：
+
+### 测试 1: 上传图片
+# curl -X POST http://localhost:8081/upload/image \
+#   -F "file=@/path/to/your/image.jpg"
+
+### 测试 2: 上传文档
+# curl -X POST http://localhost:8081/upload/document \
+#   -F "file=@/path/to/your/document.pdf"
+
+### 测试 3: 批量上传图片
+# curl -X POST http://localhost:8081/upload/images \
+#   -F "files=@/path/to/image1.jpg" \
+#   -F "files=@/path/to/image2.jpg"
+
+### 测试 4: 删除文件
+# curl -X DELETE http://localhost:8081/upload/images/test.jpg
+
+#############################################
+### Postman 测试指南
+#############################################
+
+### 1. 打开 Postman
+### 2. 创建新的 POST 请求
+### 3. URL: http://localhost:8081/upload/image
+### 4. 选择 Body → form-data
+### 5. 添加 key: file, type 选择 File
+### 6. 点击 Select Files 选择要上传的图片
+### 7. 点击 Send 发送请求
+
+#############################################
+### 前端集成示例（HTML + JavaScript）
+#############################################
+
+### HTML 代码：
+# <input type="file" id="fileInput" accept="image/*">
+# <button onclick="uploadImage()">上传图片</button>
+# <img id="preview" src="" alt="预览">
+
+### JavaScript 代码：
+# async function uploadImage() {
+#   const fileInput = document.getElementById('fileInput');
+#   const file = fileInput.files[0];
+#   
+#   const formData = new FormData();
+#   formData.append('file', file);
+#   
+#   const response = await fetch('/upload/image', {
+#     method: 'POST',
+#     body: formData
+#   });
+#   
+#   const result = await response.json();
+#   if (result.code === 200) {
+#     // 显示图片
+#     document.getElementById('preview').src = result.data.url;
+#     console.log('上传成功:', result.data.url);
+#   }
+# }
+
+#############################################
+### 支持的图片格式
+#############################################
+# ✅ jpg, jpeg, png, gif, webp, bmp
+
+#############################################
+### 支持的文档格式
+#############################################
+# ✅ pdf, doc, docx, xls, xlsx, ppt, pptx, txt, md
+
+#############################################
+### 文件大小限制
+#############################################
+# 单个文件最大：10MB
+# 批量上传最大：50MB
+
+#############################################
+### 文件存储结构
+#############################################
+# uploads/
+# ├── images/       ← 图片文件
+# ├── documents/    ← 文档文件
+# └── others/       ← 其他文件
+
+#############################################
+### 安全特性
+#############################################
+# ✅ 文件类型验证
+# ✅ 文件大小限制
+# ✅ 唯一文件名生成（UUID）
+# ✅ 文件名 sanitization（移除特殊字符）
+# ✅ 自动创建目录结构
+
+#############################################
+### 与博客集成示例
+#############################################
+
+### 在写博客时上传图片作为文章配图：
+# 1. 调用 /upload/image 接口上传图片
+# 2. 获取返回的 URL: /uploads/images/xxx.jpg
+# 3. 将 URL 保存到博客内容中
+# 4. 前端显示时直接使用 URL
+
+### 示例博客内容：
+# <p>这是一篇博客文章</p>
+# <img src="/uploads/images/article-cover.jpg" alt="封面图">
+# <p>这里是正文内容...</p>

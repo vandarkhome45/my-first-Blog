@@ -1,0 +1,190 @@
+### 全局变量定义
+@baseUrl = http://localhost:8081
+
+#############################################
+### Markdown 编辑器模块功能测试
+#############################################
+
+#############################################
+### 测试 1: 渲染 Markdown 为 HTML
+#############################################
+POST {{baseUrl}}/markdown/render
+Content-Type: application/json
+
+{
+  "markdown": "# Hello World\n\n这是一个 **Markdown** 测试。\n\n```java\npublic class Test {\n    public static void main(String[] args) {\n        System.out.println(\"Hello\");\n    }\n}\n```\n\n| 列 1 | 列 2 |\n|------|------|\n| A    | B    |"
+}
+
+###
+
+#############################################
+### 测试 2: 快速预览（前 500 字符）
+#############################################
+POST {{baseUrl}}/markdown/preview
+Content-Type: application/json
+
+{
+  "markdown": "# Spring Boot 教程\n\nSpring Boot 是一个用于创建 Spring 应用的框架。\n\n## 特性\n\n- 自动配置\n- 起步依赖\n- 命令行界面\n\n## 代码示例\n\n```java\n@SpringBootApplication\npublic class BlogApplication {\n    public static void main(String[] args) {\n        SpringApplication.run(BlogApplication.class, args);\n    }\n}\n```"
+}
+
+###
+
+#############################################
+### 测试 3: 获取摘要（200 字）
+#############################################
+POST {{baseUrl}}/markdown/summary
+Content-Type: application/json
+
+{
+  "markdown": "# 长篇文章\n\n这是一篇很长的文章内容...\n\n## 第一章\n\n详细内容详细内容详细内容详细内容详细内容详细内容详细内容详细内容详细内容详细内容详细内容详细内容详细内容详细内容详细内容详细内容详细内容详细内容详细内容详细内容详细内容详细内容详细内容详细内容详细内容",
+  "length": "100"
+}
+
+###
+
+#############################################
+### 测试 4: 分析 Markdown 文档信息
+#############################################
+POST {{baseUrl}}/markdown/info
+Content-Type: application/json
+
+{
+  "markdown": "# 标题 1\n## 标题 2\n### 标题 3\n\n这是段落内容。\n\n```java\n// 代码块 1\npublic class A {}\n```\n\n```python\n# 代码块 2\nprint('hello')\n```\n\n| 表头 | 表头 |\n|------|------|\n| 单元格 | 单元格 |\n\n[链接](https://example.com)\n\n![图片](image.png)"
+}
+
+###
+
+#############################################
+### 测试 5: 渲染包含表格的 Markdown
+#############################################
+POST {{baseUrl}}/markdown/render
+Content-Type: application/json
+
+{
+  "markdown": "# 表格测试\n\n| 姓名 | 年龄 | 城市 |\n|------|------|------|\n| 张三 | 25   | 北京 |\n| 李四 | 30   | 上海 |\n| 王五 | 28   | 广州 |\n\n## 复杂表格\n\n| 项目 | 描述 | 备注 |\n|------|------|------|\n| Spring Boot | 框架 | 非常好用 |\n| MySQL | 数据库 | 性能优秀 |"
+}
+
+###
+
+#############################################
+### 测试 6: 渲染包含代码块的 Markdown
+#############################################
+POST {{baseUrl}}/markdown/render
+Content-Type: application/json
+
+{
+  "markdown": "# 代码高亮测试\n\n## Java 示例\n\n```java\n@RestController\n@RequestMapping(\"/api\")\npublic class ApiController {\n    \n    @GetMapping(\"/hello\")\n    public String hello() {\n        return \"Hello World\";\n    }\n}\n```\n\n## Python 示例\n\n```python\ndef hello():\n    print(\"Hello from Python\")\n\nif __name__ == \"__main__\":\n    hello()\n```\n\n## JavaScript 示例\n\n```javascript\nconst express = require('express');\nconst app = express();\n\napp.get('/', (req, res) => {\n    res.send('Hello World');\n});\n\napp.listen(3000);\n```"
+}
+
+###
+
+#############################################
+### 测试 7: 渲染包含引用和列表的 Markdown
+#############################################
+POST {{baseUrl}}/markdown/render
+Content-Type: application/json
+
+{
+  "markdown": "# 引用和列表示例\n\n> 这是一段引用文字。\n> 可以有多行。\n\n## 无序列表\n\n- 项目 1\n- 项目 2\n  - 子项目 2.1\n  - 子项目 2.2\n- 项目 3\n\n## 有序列表\n\n1. 第一步\n2. 第二步\n3. 第三步\n\n## 混合列表\n\n- 前端\n  - HTML\n  - CSS\n  - JavaScript\n- 后端\n  1. Java\n  2. Python\n  3. Go"
+}
+
+###
+
+#############################################
+### 测试 8: 渲染包含链接和图片的 Markdown
+#############################################
+POST {{baseUrl}}/markdown/render
+Content-Type: application/json
+
+{
+  "markdown": "# 链接和图片\n\n## 链接\n\n- [Spring Boot 官网](https://spring.io/projects/spring-boot)\n- [GitHub](https://github.com)\n- [Markdown 语法](https://www.markdownguide.org)\n\n## 图片\n\n![Logo](https://via.placeholder.com/150)\n\n![Banner](https://via.placeholder.com/600x200)\n\n## 带标题的图片\n\n![替代文本](https://via.placeholder.com/300 \"图片标题\")"
+}
+
+###
+
+#############################################
+### API 接口说明
+#############################################
+
+### 1. POST /markdown/render
+### 功能：将 Markdown 渲染为 HTML
+### 请求：{"markdown": "..."}
+### 响应：{"html": "...", "original": "..."}
+
+### 2. POST /markdown/preview
+### 功能：快速预览（渲染前 500 字符）
+### 请求：{"markdown": "..."}
+### 响应：{"html": "...", "length": "xxx"}
+
+### 3. POST /markdown/summary
+### 功能：提取纯文本摘要
+### 请求：{"markdown": "...", "length": "200"}
+### 响应：{"summary": "...", "length": "xxx"}
+
+### 4. POST /markdown/info
+### 功能：分析 Markdown 文档信息
+### 请求：{"markdown": "..."}
+### 响应：{
+###   "totalLength": xxx,
+###   "lineCount": xxx,
+###   "hasCodeBlocks": true/false,
+###   "hasTables": true/false,
+###   "hasImages": true/false,
+###   "hasLinks": true/false,
+###   "codeBlockCount": xxx,
+###   "headingCount": xxx
+### }
+
+#############################################
+### 支持的 Markdown 语法
+#############################################
+
+### 标题
+# H1
+## H2
+### H3
+
+### 强调
+**粗体**
+*斜体*
+~~删除线~~
+
+### 列表
+- 无序列表
+1. 有序列表
+
+### 引用
+> 引用内容
+
+### 代码
+`行内代码`
+
+```语言名
+代码块
+```
+
+### 链接和图片
+[链接文本](URL)
+![替代文本](图片 URL)
+
+### 表格
+| 表头 | 表头 |
+|------|------|
+| 单元格 | 单元格 |
+
+#############################################
+### 前端集成方式
+#############################################
+
+### 方法 1: 使用提供的测试页面
+# 访问：http://localhost:8081/markdown-editor.html
+
+### 方法 2: 集成到现有编辑器
+# 1. 在保存前调用 /markdown/render
+# 2. 将返回的 HTML 保存到 content 字段
+# 3. 原始 Markdown 保存到 originalContent 字段
+
+### 方法 3: 实时预览
+# 监听编辑器 input 事件
+# 防抖后调用 /markdown/preview
+# 显示返回的 HTML

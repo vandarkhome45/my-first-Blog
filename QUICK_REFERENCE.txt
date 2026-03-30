@@ -1,0 +1,139 @@
+# ===========================================
+# 快速修改指南 - Quick Reference
+# ===========================================
+
+## 🎯 我要修改...（按场景查找）
+
+### 📝 博客文章相关
+
+| 需求 | 修改文件 | 路径 |
+|------|---------|------|
+| 添加字段（如作者、封面图） | BlogEntity.java | module/blog/entity/ |
+| 修改文章内容限制 | BlogEntity.java | module/blog/entity/ |
+| 添加新的查询方式 | BlogRepository.java | module/blog/repository/ |
+| 修改业务逻辑 | BlogService.java | module/blog/service/ |
+| 添加新 API 接口 | BlogController.java | module/blog/controller/ |
+| 测试博客功能 | blog-api-test.http | src/test/resources/ |
+
+---
+
+### 💬 评论相关
+
+| 需求 | 修改文件 | 路径 |
+|------|---------|------|
+| 添加评论字段（如头像、IP） | Comment.java | module/comment/entity/ |
+| 修改评论逻辑 | CommentService.java | module/comment/service/ |
+| 添加审核功能 | Comment.java + Service | module/comment/ |
+| 添加点赞功能 | Comment.java + Service | module/comment/ |
+| 修改评论 API | CommentController.java | module/comment/controller/ |
+| 测试评论功能 | comment-api-test.http | src/test/resources/ |
+
+---
+
+### 🔍 搜索相关
+
+| 需求 | 修改文件 | 路径 |
+|------|---------|------|
+| 调整搜索算法 | SearchService.java | module/search/service/ |
+| 添加搜索范围 | SearchService.java | module/search/service/ |
+| 修改高亮逻辑 | SearchService.java | module/search/service/ |
+| 添加搜索 API | SearchController.java | module/search/controller/ |
+| 测试搜索功能 | search-module-test.http | src/test/resources/ |
+
+---
+
+### ⚙️ 全局配置
+
+| 需求 | 修改文件 | 路径 |
+|------|---------|------|
+| 启用/禁用模块 | module-config.properties | src/main/resources/ |
+| 修改端口号 | application.properties | src/main/resources/ |
+| 修改数据库连接 | application.properties | src/main/resources/ |
+| 修改响应格式 | Result.java | common/ |
+| 添加异常类型 | GlobalExceptionHandler.java | exception/ |
+
+---
+
+## 🚀 标准修改流程
+
+```
+1. 确定需求 → 2. 找到模块 → 3. 自底向上修改 → 4. 测试验证
+```
+
+### 示例：给博客添加"作者"字段
+
+```
+Step 1: BlogEntity.java
+  - 添加 private String author; 字段
+  - 添加 getter/setter
+
+Step 2: BlogRepository.java
+  - （可选）添加 findByAuthor 方法
+
+Step 3: BlogService.java
+  - （可选）添加按作者查询的方法
+
+Step 4: BlogController.java
+  - 修改新增/更新接口，接收 author 参数
+
+Step 5: 测试
+  - 运行 blog-api-test.http
+```
+
+---
+
+## 📂 核心目录速记
+
+```
+module/          ← 业务模块都在这
+├── blog/        ← 博客模块
+├── comment/     ← 评论模块
+└── search/      ← 搜索模块
+
+common/          ← 公共组件（所有模块共用）
+config/          ← 配置类
+interceptor/     ← 拦截器
+exception/       ← 异常处理
+```
+
+---
+
+## 🔑 关键文件说明
+
+| 文件名 | 作用 | 修改频率 |
+|--------|------|---------|
+| BlogEntity.java | 定义博客数据结构 | ⭐⭐⭐ |
+| BlogController.java | 提供博客 API | ⭐⭐⭐ |
+| Comment.java | 定义评论数据结构 | ⭐⭐ |
+| SearchService.java | 实现搜索算法 | ⭐⭐ |
+| module-config.properties | 模块开关配置 | ⭐ |
+| Result.java | 统一响应格式 | ⭐ |
+
+⭐越多表示修改频率越高
+
+---
+
+## 💡 IDEA 快捷键（Mac）
+
+| 功能 | 快捷键 | 用途 |
+|------|--------|------|
+| 搜索文件 | Cmd + Shift + N | 快速找文件 |
+| 搜索文本 | Cmd + Shift + F | 全局搜索 |
+| 最近文件 | Cmd + E | 快速切换 |
+| 查看结构 | Cmd + F12 | 查看类的方法 |
+| 生成代码 | Cmd + N | 生成 getter/setter |
+
+---
+
+## ✅ 修改前检查清单
+
+- [ ] 确定要修改哪个模块
+- [ ] 找到对应的文件
+- [ ] 理解现有代码逻辑
+- [ ] 按层级修改（Entity → Controller）
+- [ ] 运行测试验证
+- [ ] 提交 Git
+
+---
+
+📖 详细文档请查看：MODULE_INDEX.txt

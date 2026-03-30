@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>文件上传测试</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+        }
+        .upload-section {
+            border: 2px dashed #ccc;
+            padding: 30px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .upload-section:hover {
+            border-color: #666;
+            background-color: #f9f9f9;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .result {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #f0f0f0;
+            border-radius: 5px;
+        }
+        .preview {
+            margin-top: 15px;
+            max-width: 100%;
+            border: 1px solid #ddd;
+            padding: 10px;
+        }
+        .error {
+            color: red;
+            background-color: #ffe6e6;
+        }
+        .success {
+            color: green;
+            background-color: #e6ffe6;
+        }
+    </style>
+</head>
+<body>
+    <h1>📤 文件上传功能测试</h1>
+    
+    <!-- 单图上传 -->
+    <div class="upload-section">
+        <h3>上传图片（单张）</h3>
+        <input type="file" id="singleImage" accept="image/*">
+        <br>
+        <button onclick="uploadSingleImage()">上传</button>
+        <div id="singleResult"></div>
+    </div>
+
+    <!-- 批量上传 -->
+    <div class="upload-section">
+        <h3>批量上传图片</h3>
+        <input type="file" id="multipleImages" accept="image/*" multiple>
+        <br>
+        <button onclick="uploadMultipleImages()">批量上传</button>
+        <div id="multipleResult"></div>
+    </div>
+
+    <!-- 文档上传 -->
+    <div class="upload-section">
+        <h3>上传文档</h3>
+        <input type="file" id="document" accept=".pdf,.doc,.docx,.xls,.xlsx,.txt,.md">
+        <br>
+        <button onclick="uploadDocument()">上传</button>
+        <div id="documentResult"></div>
+    </div>
+
+    <script>
+        const BASE_URL = 'http://localhost:8081';
+
+        // 上传单张图片
+        async function uploadSingleImage() {
+            const fileInput = document.getElementById('singleImage');
+            const resultDiv = document.getElementById('singleResult');
+            
+            if (fileInput.files.length === 0) {
+                resultDiv.innerHTML = '<p class="error">请选择文件</p>';
+                return;
+            }
+
+            const file = fileInput.files[0];
+            const formData = new FormData();
+            formData.append('file', file);
+
+            try {
+                resultDiv.innerHTML = '<p>⏳ 上传中...</p>';
+                
+                const response = await fetch(`${BASE_URL}/upload/image`, {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const result = await response.json();
+                
+                if (result.code === 200) {
+                    resultDiv.innerHTML = `
+                        <div class="success">
+                            <p>✅ 上传成功！</p>
+                            <p><strong>文件名:</strong> ${result.data.filename}</p>
+                            <p><strong>大小:</strong> ${(file.size / 1024).toFixed(2)} KB</p>
+                            <p><strong>URL:</strong> <a href="${BASE_URL}${result.data.url}" target="_blank">${result.data.url}</a></p>
+                            <img src="${BASE_URL}${result.data.url}" class="preview" alt="预览">
+                        </div>
+                    `;
+                } else {
+                    resultDiv.innerHTML = `<p class="error">❌ 上传失败：${result.msg}</p>`;
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `<p class="error">❌ 上传失败：${error.message}</p>`;
+            }
+        }
+
+        // 批量上传
+        async function uploadMultipleImages() {
+            const fileInput = document.getElementById('multipleImages');
+            const resultDiv = document.getElementById('multipleResult');
+            
+            if (fileInput.files.length === 0) {
+                resultDiv.innerHTML = '<p class="error">请选择文件</p>';
+                return;
+            }
+
+            const formData = new FormData();
+            for (let i = 0; i < fileInput.files.length; i++) {
+                formData.append('files', fileInput.files[i]);
+            }
+
+            try {
+                resultDiv.innerHTML = '<p>⏳ 上传中...</p>';
+                
+                const response = await fetch(`${BASE_URL}/upload/images`, {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const result = await response.json();
+                
+                if (result.code === 200) {
+                    let html = '<div class="success"><p>✅ 批量上传成功！</p><ul>';
+                    result.data.forEach(url => {
+                        html += `<li><a href="${BASE_URL}${url}" target="_blank">${url}</a></li>`;
+                    });
+                    html += '</ul></div>';
+                    resultDiv.innerHTML = html;
+                } else {
+                    resultDiv.innerHTML = `<p class="error">❌ 上传失败：${result.msg}</p>`;
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `<p class="error">❌ 上传失败：${error.message}</p>`;
+            }
+        }
+
+        // 上传文档
+        async function uploadDocument() {
+            const fileInput = document.getElementById('document');
+            const resultDiv = document.getElementById('documentResult');
+            
+            if (fileInput.files.length === 0) {
+                resultDiv.innerHTML = '<p class="error">请选择文件</p>';
+                return;
+            }
+
+            const file = fileInput.files[0];
+            const formData = new FormData();
+            formData.append('file', file);
+
+            try {
+                resultDiv.innerHTML = '<p>⏳ 上传中...</p>';
+                
+                const response = await fetch(`${BASE_URL}/upload/document`, {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const result = await response.json();
+                
+                if (result.code === 200) {
+                    resultDiv.innerHTML = `
+                        <div class="success">
+                            <p>✅ 上传成功！</p>
+                            <p><strong>文件名:</strong> ${result.data.filename}</p>
+                            <p><strong>大小:</strong> ${(file.size / 1024).toFixed(2)} KB</p>
+                            <p><strong>URL:</strong> <a href="${BASE_URL}${result.data.url}" target="_blank">${result.data.url}</a></p>
+                        </div>
+                    `;
+                } else {
+                    resultDiv.innerHTML = `<p class="error">❌ 上传失败：${result.msg}</p>`;
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `<p class="error">❌ 上传失败：${error.message}</p>`;
+            }
+        }
+    </script>
+</body>
+</html>

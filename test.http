@@ -1,0 +1,65 @@
+### 新增博客
+POST http://localhost:8080/blog
+Content-Type: application/json
+
+{
+  "title": "第一篇博客",
+  "content": "这是测试内容"
+}
+
+###
+
+### 查询全部
+GET http://localhost:8080/blog
+
+###
+
+### 根据ID查询（存在）
+GET http://localhost:8080/blog/1
+
+###
+
+### 根据ID查询（不存在 -> 测试异常）
+GET http://localhost:8080/blog/999
+
+###
+
+### 更新博客（存在）
+PUT http://localhost:8080/blog/1
+Content-Type: application/json
+
+{
+  "title": "更新后的标题",
+  "content": "更新后的内容"
+}
+
+###
+
+### 更新博客（不存在 -> 测试异常）
+PUT http://localhost:8080/blog/999
+Content-Type: application/json
+
+{
+  "title": "不存在的更新",
+  "content": "测试异常"
+}
+
+###
+
+### 删除博客（存在）
+DELETE http://localhost:8080/blog/1
+
+###
+
+### 删除博客（不存在 -> 测试异常）
+DELETE http://localhost:8080/blog/999
+
+###
+
+### 分页查询
+GET http://localhost:8080/blog/page?page=0&size=3
+
+###
+
+### 分页查询（第二页）
+GET http://localhost:8080/blog/page?page=1&size=3

@@ -1,0 +1,330 @@
+# ===========================================
+# 博客系统 - 模块化开发指南
+# Module Development Guide
+# ===========================================
+
+本文档帮助你快速定位和修改特定功能模块。
+
+## 📂 项目目录结构总览
+
+```
+src/main/java/com/example/blog/
+│
+├── module/                          ← 【核心】业务模块目录
+│   │
+│   ├── blog/                        ← 博客文章模块
+│   │   ├── entity/
+│   │   │   └── BlogEntity.java     【实体】博客数据结构
+│   │   ├── repository/
+│   │   │   └── BlogRepository.java 【数据层】数据库操作
+│   │   ├── service/
+│   │   │   └── BlogService.java    【服务层】业务逻辑
+│   │   └── controller/
+│   │       └── BlogController.java 【控制器】REST API
+│   │
+│   ├── comment/                     ← 评论模块
+│   │   ├── entity/
+│   │   │   └── Comment.java        【实体】评论数据结构
+│   │   ├── repository/
+│   │   │   └── CommentRepository.java
+│   │   ├── service/
+│   │   │   └── CommentService.java
+│   │   ├── controller/
+│   │   │   └── CommentController.java
+│   │   └── dto/
+│   │       └── CommentDTO.java     【数据传输对象】
+│   │
+│   └── search/                      ← 搜索模块
+│       ├── service/
+│       │   └── SearchService.java  【服务层】搜索逻辑
+│       └── controller/
+│           └── SearchController.java【控制器】搜索 API
+│
+├── common/                          ← 公共组件（所有模块共用）
+│   ├── Result.java                 【通用】统一响应格式
+│   └── PageResult.java             【通用】分页结果格式
+│
+├── config/                          ← 全局配置
+│   ├── ModuleConfig.java           【配置】模块开关配置读取
+│   └── WebConfig.java              【配置】Web 拦截器注册
+│
+├── interceptor/                     ← 拦截器
+│   └── ModuleInterceptor.java      【拦截器】模块启用检查
+│
+└── exception/                       ← 异常处理
+    ├── BlogException.java          【异常】自定义异常类
+    └── GlobalExceptionHandler.java 【异常】全局异常处理
+```
+
+---
+
+## 🔍 快速定位指南
+
+### 场景 1：修改博客文章相关功能
+
+**需求示例：**
+- 添加新字段（如作者、封面图）
+- 修改文章结构
+- 调整 CRUD 逻辑
+
+**需要修改的文件：**
+```
+1. 数据结构 → module/blog/entity/BlogEntity.java
+2. 数据库操作 → module/blog/repository/BlogRepository.java
+3. 业务逻辑 → module/blog/service/BlogService.java
+4. API 接口 → module/blog/controller/BlogController.java
+```
+
+**修改流程：**
+```
+Entity (加字段) → Repository (加方法) → Service (加逻辑) → Controller (加接口)
+```
+
+---
+
+### 场景 2：修改评论功能
+
+**需求示例：**
+- 评论需要审核
+- 添加点赞功能
+- 修改回复逻辑
+
+**需要修改的文件：**
+```
+1. 数据结构 → module/comment/entity/Comment.java
+2. 数据库操作 → module/comment/repository/CommentRepository.java
+3. 业务逻辑 → module/comment/service/CommentService.java
+4. API 接口 → module/comment/controller/CommentController.java
+5. 数据传输 → module/comment/dto/CommentDTO.java
+```
+
+---
+
+### 场景 3：修改搜索功能
+
+**需求示例：**
+- 调整搜索算法
+- 添加新的搜索范围
+- 修改高亮逻辑
+
+**需要修改的文件：**
+```
+1. 搜索逻辑 → module/search/service/SearchService.java
+2. API 接口 → module/search/controller/SearchController.java
+```
+
+**注意：** 搜索模块只有 Service 和 Controller，没有 Entity 和 Repository
+（因为它复用 Blog 模块的数据）
+
+---
+
+### 场景 4：修改全局配置
+
+**需求示例：**
+- 启用/禁用某个模块
+- 修改端口号
+- 调整数据库连接
+
+**需要修改的文件：**
+```
+1. 模块开关 → src/main/resources/module-config.properties
+2. 应用配置 → src/main/resources/application.properties
+```
+
+---
+
+### 场景 5：修改响应格式或异常处理
+
+**需求示例：**
+- 统一返回格式调整
+- 添加新的异常类型
+- 修改错误消息
+
+**需要修改的文件：**
+```
+1. 响应格式 → common/Result.java
+2. 分页格式 → common/PageResult.java
+3. 异常处理 → exception/GlobalExceptionHandler.java
+```
+
+---
+
+## 📋 各模块职责说明
+
+### 🟦 Blog Module（博客模块）
+**位置：** `module/blog/`  
+**职责：** 博客文章的增删改查、分类管理、标签管理  
+**关键文件：**
+- `BlogEntity.java` - 定义博客数据结构（标题、内容、分类、标签等）
+- `BlogController.java` - 提供 REST API（/blog/**）
+
+**API 接口：**
+```
+POST   /blog                    新增博客
+GET    /blog                    查询所有
+GET    /blog/{id}               查询单个
+PUT    /blog/{id}               更新博客
+DELETE /blog/{id}               删除博客
+GET    /blog/page               分页查询
+GET    /blog/category           按分类查询
+GET    /blog/tag                按标签查询
+```
+
+---
+
+### 🟩 Comment Module（评论模块）
+**位置：** `module/comment/`  
+**职责：** 评论管理、回复功能  
+**关键文件：**
+- `Comment.java` - 定义评论数据结构（内容、作者、邮箱、父评论 ID 等）
+- `CommentController.java` - 提供 REST API（/comment/**）
+
+**API 接口：**
+```
+POST   /comment                 新增评论
+GET    /comment/list            查询博客的所有评论
+GET    /comment/{id}            查询单条评论
+DELETE /comment/{id}            删除评论
+POST   /comment/reply           回复评论
+GET    /comment/replies         查询回复列表
+```
+
+---
+
+### 🟨 Search Module（搜索模块）
+**位置：** `module/search/`  
+**职责：** 全文搜索、高级搜索、关键词高亮  
+**关键文件：**
+- `SearchService.java` - 实现搜索算法和高亮逻辑
+- `SearchController.java` - 提供搜索相关的 REST API（/search/**）
+
+**API 接口：**
+```
+GET    /search                  全文搜索
+GET    /search/advanced         高级搜索
+GET    /search/category/{cat}   按分类搜索
+POST   /search/highlight        关键词高亮
+GET    /search/suggest          搜索建议
+GET    /search/popular          热门搜索
+```
+
+---
+
+## 🎯 修改功能的正确姿势
+
+### ✅ 推荐做法
+
+1. **明确需求** - 要修改哪个功能？
+2. **定位模块** - 找到对应的 module 目录
+3. **自底向上修改**：
+   ```
+   Entity → Repository → Service → Controller
+   ```
+4. **测试验证** - 使用对应的 HTTP 测试文件
+
+**示例：给博客添加"阅读量"字段**
+```
+Step 1: 修改 BlogEntity.java（加 viewCount 字段）
+Step 2: 修改 BlogService.java（加阅读计数逻辑）
+Step 3: 修改 BlogController.java（返回阅读量数据）
+Step 4: 测试 → 运行 blog-api-test.http
+```
+
+---
+
+### ❌ 避免的做法
+
+1. **跨模块修改** - 不要在 Blog 模块里改 Comment 的代码
+2. **直接改数据库** - 先改 Entity，让 JPA 自动建表
+3. **跳过 Service** - Controller 不要直接调用 Repository
+4. **忽略测试** - 修改后一定要运行测试文件
+
+---
+
+## 🛠️ 常用修改速查表
+
+| 我想... | 需要修改的文件 | 所属模块 |
+|---------|--------------|---------|
+| 给博客添加新字段 | `module/blog/entity/BlogEntity.java` | Blog |
+| 添加新的博客 API | `module/blog/controller/BlogController.java` | Blog |
+| 修改评论逻辑 | `module/comment/service/CommentService.java` | Comment |
+| 添加评论审核 | `module/comment/entity/Comment.java` + Service | Comment |
+| 调整搜索算法 | `module/search/service/SearchService.java` | Search |
+| 添加搜索接口 | `module/search/controller/SearchController.java` | Search |
+| 禁用某个功能 | `src/main/resources/module-config.properties` | Config |
+| 修改返回格式 | `common/Result.java` | Common |
+| 添加全局异常 | `exception/GlobalExceptionHandler.java` | Exception |
+
+---
+
+## 📝 开发清单
+
+### 添加新功能的标准流程
+
+1. **创建模块目录**
+   ```
+   module/new-feature/
+   ├── entity/
+   ├── repository/
+   ├── service/
+   └── controller/
+   ```
+
+2. **编写代码**
+   - Entity 定义数据结构
+   - Repository 定义数据访问
+   - Service 实现业务逻辑
+   - Controller 提供 API 接口
+
+3. **配置模块**
+   - 在 `module-config.properties` 中添加开关
+   - 在 `ModuleInterceptor` 中添加检查逻辑（可选）
+
+4. **编写测试**
+   - 创建 `xxx-module-test.http` 测试文件
+
+5. **提交代码**
+   - 使用 Git 提交并推送
+
+---
+
+## 💡 小贴士
+
+### 快速查找技巧
+
+**IDEA 快捷键：**
+- `Cmd + Shift + N` - 搜索任意文件
+- `Cmd + E` - 最近打开的文件
+- `Cmd + Shift + F` - 全局搜索文本
+
+**搜索示例：**
+```
+想找博客的 Controller → 输入 "BlogController"
+想找评论的 Service → 输入 "CommentService"
+想找搜索相关 → 输入 "Search"
+```
+
+### 理解模块化的好处
+
+✅ **易维护** - 每个功能独立，修改不影响其他模块  
+✅ **易理解** - 新人可以快速找到对应代码  
+✅ **易扩展** - 添加新功能只需创建新模块  
+✅ **易测试** - 可以单独测试每个模块  
+
+---
+
+## 🎉 总结
+
+现在的博客系统采用**高度模块化**的设计：
+
+- **3 个核心业务模块**：Blog、Comment、Search
+- **每个模块独立**：Entity → Repository → Service → Controller
+- **公共组件共享**：Common、Config、Exception
+- **配置集中管理**：module-config.properties
+
+**以后修改任何功能，只需：**
+1. 根据本指南找到对应模块
+2. 按层级修改（Entity → Controller）
+3. 运行测试验证
+
+这样就能轻松维护和扩展你的博客系统了！🚀

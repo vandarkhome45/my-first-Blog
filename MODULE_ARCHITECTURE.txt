@@ -1,0 +1,249 @@
+# 博客系统模块化架构说明
+
+## 📐 模块化设计理念
+
+本项目采用**领域驱动设计（DDD）**思想，按业务功能划分模块，而非按技术层划分。
+
+### 传统分层 vs 模块化分层
+
+#### ❌ 传统分层（不推荐）
+```
+src/main/java/
+├── controller/
+│   ├── BlogController.java
+│   └── CommentController.java    ← 不同模块混在一起
+├── service/
+│   ├── BlogService.java
+│   └── CommentService.java       ← 不同模块混在一起
+└── entity/
+    ├── Blog.java
+    └── Comment.java              ← 不同模块混在一起
+```
+
+**问题：**
+- 模块耦合严重
+- 难以单独维护
+- 代码膨胀后难以阅读
+
+---
+
+#### ✅ 模块化分层（推荐）
+```
+src/main/java/
+├── module/
+│   ├── blog/                     ← 博客核心模块
+│   │   ├── controller/
+│   │   │   └── BlogController.java
+│   │   ├── service/
+│   │   │   └── BlogService.java
+│   │   ├── repository/
+│   │   │   └── BlogRepository.java
+│   │   └── entity/
+│   │       └── BlogEntity.java
+│   │
+│   └── comment/                  ← 评论模块
+│       ├── controller/
+│       │   └── CommentController.java
+│       ├── service/
+│       │   └── CommentService.java
+│       ├── repository/
+│       │   └── CommentRepository.java
+│       ├── entity/
+│       │   └── Comment.java
+│       └── dto/
+│           └── CommentDTO.java
+│
+└── common/                       ← 公共组件
+    ├── Result.java
+    └── PageResult.java
+```
+
+**优点：**
+- ✅ 模块独立，职责清晰
+- ✅ 易于维护和升级
+- ✅ 可以按需启用/禁用模块
+- ✅ 适合团队协作开发
+
+---
+
+## 📦 模块列表
+
+### 1. Blog Module（博客核心模块）
+**位置：** `module/blog/`  
+**功能：** 博客文章的 CRUD、分类管理、标签管理  
+**依赖：** 无（独立模块）
+
+**文件结构：**
+```
+module/blog/
+├── controller/BlogController.java      # REST API 接口
+├── service/BlogService.java            # 业务逻辑
+├── repository/BlogRepository.java      # 数据访问
+└── entity/BlogEntity.java              # 实体类
+```
+
+**API 接口：**
+- `POST /blog` - 新增博客
+- `GET /blog` - 查询所有
+- `GET /blog/{id}` - 查询单个
+- `PUT /blog/{id}` - 更新
+- `DELETE /blog/{id}` - 删除
+- `GET /blog/page` - 分页查询
+- `GET /blog/category?category=Java` - 按分类查询
+- `GET /blog/tag?tag=Spring` - 按标签查询
+
+---
+
+### 2. Comment Module（评论模块）
+**位置：** `module/comment/`  
+**功能：** 评论管理、回复功能  
+**依赖：** Blog 模块（通过 blogId 关联）
+
+**文件结构：**
+```
+module/comment/
+├── controller/CommentController.java   # REST API 接口
+├── service/CommentService.java         # 业务逻辑
+├── repository/CommentRepository.java   # 数据访问
+├── entity/Comment.java                 # 实体类
+└── dto/CommentDTO.java                 # 数据传输对象
+```
+
+**API 接口：**
+- `POST /comment?blogId=1` - 新增评论
+- `GET /comment/list?blogId=1` - 查询博客的所有评论
+- `GET /comment/{id}` - 查询单条评论
+- `DELETE /comment/{id}` - 删除评论
+- `POST /comment/reply?parentId=1` - 回复评论
+- `GET /comment/replies?parentId=1` - 查看回复列表
+
+---
+
+### 3. Common Module（公共模块）
+**位置：** `common/`, `config/`, `exception/`  
+**功能：** 全局异常处理、统一响应格式、配置类
+
+**包含：**
+- `Result<T>` - 统一响应封装
+- `PageResult<T>` - 分页结果封装
+- `GlobalExceptionHandler` - 全局异常处理
+- `ModuleConfig` - 模块开关配置
+- `ModuleInterceptor` - 模块拦截器
+
+---
+
+## 🔧 模块化优势
+
+### 1. **独立开发**
+每个模块可以独立开发、测试，互不影响。
+
+### 2. **按需启用**
+通过 `module-config.properties` 控制模块启用/禁用：
+```properties
+module.blog.enabled=true
+module.comment.enabled=true
+```
+
+### 3. **易于升级**
+需要添加新功能？只需创建新模块：
+```
+module/search/          # 搜索模块
+module/user/            # 用户模块
+module/statistics/      # 统计模块
+```
+
+### 4. **代码复用**
+公共组件放在 `common/` 目录，各模块共享。
+
+---
+
+## 📝 开发指南
+
+### 添加新功能的步骤
+
+假设要添加"标签管理"功能：
+
+**Step 1:** 创建标签模块
+```
+module/tag/
+├── controller/TagController.java
+├── service/TagService.java
+├── repository/TagRepository.java
+└── entity/TagEntity.java
+```
+
+**Step 2:** 在 `module-config.properties` 中注册
+```properties
+module.tag.enabled=true
+```
+
+**Step 3:** 编写业务逻辑和 API
+
+**Step 4:** 测试模块功能
+
+**完成！** 不会影响其他模块。
+
+---
+
+## 🎯 最佳实践
+
+### ✅ 推荐做法
+1. 每个模块只负责一个业务领域
+2. 模块间通过 ID 关联，避免直接依赖
+3. 使用 DTO 进行数据传输
+4. 公共代码放在 `common/` 目录
+
+### ❌ 避免的做法
+1. 跨模块直接调用实体类
+2. 在一个模块中引用另一个模块的 Service
+3. 将所有代码写在一个大包里
+4. 模块职责不清晰
+
+---
+
+## 🚀 未来扩展
+
+当前是轻量化版本，未来可以按需添加：
+
+### 搜索模块
+```
+module/search/
+├── controller/SearchController.java
+├── service/SearchService.java
+└── ...
+```
+
+### 用户认证模块
+```
+module/auth/
+├── controller/AuthController.java
+├── service/AuthService.java
+├── entity/UserEntity.java
+└── ...
+```
+
+### 统计模块
+```
+module/statistics/
+├── controller/StatisticsController.java
+├── service/StatisticsService.java
+└── ...
+```
+
+---
+
+## 💡 总结
+
+模块化设计的核心思想：
+- **高内聚** - 相关代码放在一起
+- **低耦合** - 模块间依赖最小化
+- **易维护** - 每个模块独立清晰
+- **可扩展** - 按需添加新功能
+
+这样的设计让你的个人博客系统：
+- ✅ 代码量适中（约 500-800 行）
+- ✅ 结构清晰
+- ✅ 易于理解和维护
+- ✅ 方便后续升级
+
+祝开发愉快！🎉

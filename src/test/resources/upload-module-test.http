@@ -1,0 +1,65 @@
+### 全局变量定义
+@baseUrl = http://localhost:8081
+
+#############################################
+### 文件上传模块 - 可运行的测试
+#############################################
+
+### 注意：由于 HTTP Client 不支持 multipart/form-data
+### 以下测试仅用于验证服务连通性，不能测试实际上传
+### 实际上传请使用 test-upload.sh 或浏览器测试页面
+
+#############################################
+### 测试服务是否正常运行
+#############################################
+
+### 测试 1: 检查服务状态
+GET {{baseUrl}}/search/popular
+Accept: application/json
+
+###
+
+### 测试 2: 获取博客列表（验证基本功能）
+GET {{baseUrl}}/blog
+Accept: application/json
+
+###
+
+### 测试 3: 访问上传目录（应该返回 403 或空目录）
+GET {{baseUrl}}/uploads/
+
+###
+
+#############################################
+### 以下是模拟的上传请求示例（仅供参考）
+### 实际运行时会被跳过或报错
+#############################################
+
+### ❌ 以下请求无法运行，仅供参考格式
+
+### POST /upload/image
+### Content-Type: multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW
+### 
+### ------WebKitFormBoundary7MA4YWxkTrZu0gW
+### Content-Disposition: form-data; name="file"; filename="test.jpg"
+### Content-Type: image/jpeg
+### 
+### <binary data>
+### ------WebKitFormBoundary7MA4YWxkTrZu0gW--
+
+#############################################
+### 正确的测试方法
+#############################################
+
+### 方法 1: 使用自动化脚本
+### bash test-upload.sh
+
+### 方法 2: 使用 curl 命令
+### curl -X POST http://localhost:8081/upload/image -F "file=@test.jpg"
+
+### 方法 3: 使用 Postman
+### POST http://localhost:8081/upload/image
+### Body -> form-data -> File -> 选择文件
+
+### 方法 4: 使用浏览器测试页面
+### 访问 http://localhost:8081/upload-test.html

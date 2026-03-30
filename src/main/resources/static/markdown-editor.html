@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Markdown 编辑器测试</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background: #f5f5f5;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: #2c3e50;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+        
+        .editor-container {
+            display: flex;
+            height: 600px;
+        }
+        
+        .editor-pane, .preview-pane {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+        }
+        
+        .editor-pane {
+            border-right: 1px solid #ddd;
+            background: #fafafa;
+        }
+        
+        .preview-pane {
+            background: white;
+        }
+        
+        textarea {
+            width: 100%;
+            height: 100%;
+            border: none;
+            resize: none;
+            font-family: "Monaco", "Menlo", "Consolas", monospace;
+            font-size: 14px;
+            line-height: 1.6;
+            outline: none;
+        }
+        
+        .toolbar {
+            padding: 10px 20px;
+            background: #ecf0f1;
+            border-bottom: 1px solid #ddd;
+            display: flex;
+            gap: 10px;
+        }
+        
+        .toolbar button {
+            padding: 8px 15px;
+            background: #3498db;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        
+        .toolbar button:hover {
+            background: #2980b9;
+        }
+        
+        .info-bar {
+            padding: 10px 20px;
+            background: #f8f9fa;
+            border-top: 1px solid #ddd;
+            font-size: 13px;
+            color: #666;
+            display: flex;
+            justify-content: space-between;
+        }
+        
+        /* Markdown 样式 */
+        .markdown-body {
+            line-height: 1.6;
+        }
+        
+        .markdown-body h1, .markdown-body h2, .markdown-body h3, 
+        .markdown-body h4, .markdown-body h5, .markdown-body h6 {
+            margin-top: 24px;
+            margin-bottom: 16px;
+            font-weight: 600;
+            line-height: 1.25;
+        }
+        
+        .markdown-body h1 { font-size: 2em; border-bottom: 1px solid #eee; padding-bottom: 0.3em; }
+        .markdown-body h2 { font-size: 1.5em; border-bottom: 1px solid #eee; padding-bottom: 0.3em; }
+        .markdown-body h3 { font-size: 1.25em; }
+        
+        .markdown-body p { margin-bottom: 16px; }
+        
+        .markdown-body code {
+            padding: 0.2em 0.4em;
+            margin: 0;
+            font-size: 85%;
+            background-color: rgba(27,31,35,0.05);
+            border-radius: 3px;
+            font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+        }
+        
+        .markdown-body pre {
+            padding: 16px;
+            overflow: auto;
+            font-size: 85%;
+            line-height: 1.45;
+            background-color: #f6f8fa;
+            border-radius: 3px;
+        }
+        
+        .markdown-body pre code {
+            display: inline;
+            max-width: auto;
+            padding: 0;
+            margin: 0;
+            overflow: visible;
+            line-height: inherit;
+            word-wrap: normal;
+            background-color: transparent;
+            border: 0;
+        }
+        
+        .markdown-body blockquote {
+            padding: 0 1em;
+            color: #6a737d;
+            border-left: 0.25em solid #dfe2e5;
+            margin: 0 0 16px 0;
+        }
+        
+        .markdown-body ul, .markdown-body ol {
+            padding-left: 2em;
+            margin-bottom: 16px;
+        }
+        
+        .markdown-body table {
+            border-collapse: collapse;
+            margin-bottom: 16px;
+            width: 100%;
+        }
+        
+        .markdown-body table th, .markdown-body table td {
+            padding: 6px 13px;
+            border: 1px solid #dfe2e5;
+        }
+        
+        .markdown-body table tr:nth-child(2n) {
+            background-color: #f6f8fa;
+        }
+        
+        .markdown-body a {
+            color: #0366d6;
+            text-decoration: none;
+        }
+        
+        .markdown-body a:hover {
+            text-decoration: underline;
+        }
+        
+        .markdown-body img {
+            max-width: 100%;
+            height: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📝 Markdown 编辑器测试</h1>
+            <p>实时预览 Markdown 渲染效果</p>
+        </div>
+        
+        <div class="toolbar">
+            <button onclick="insertText('# ')" title="标题"># 标题</button>
+            <button onclick="insertText('**', '**')" title="粗体">**粗体**</button>
+            <button onclick="insertText('*', '*')" title="斜体">*斜体*</button>
+            <button onclick="insertText('`', '`')" title="行内代码">`代码`</button>
+            <button onclick="insertText('```\\n', '\\n```')" title="代码块">代码块</button>
+            <button onclick="insertText('> ')" title="引用">引用</button>
+            <button onclick="insertText('- ')" title="列表">列表</button>
+            <button onclick="insertText('[', '](url)')" title="链接">链接</button>
+            <button onclick="insertText('![', '](url)')" title="图片">图片</button>
+            <button onclick="loadExample()" title="加载示例">加载示例</button>
+            <button onclick="renderMarkdown()" title="渲染">🔄 立即渲染</button>
+        </div>
+        
+        <div class="editor-container">
+            <div class="editor-pane">
+                <textarea id="markdown-input" placeholder="在这里输入 Markdown 内容..."></textarea>
+            </div>
+            <div class="preview-pane">
+                <div id="preview-output" class="markdown-body"></div>
+            </div>
+        </div>
+        
+        <div class="info-bar">
+            <div id="char-count">字符数：0</div>
+            <div id="line-count">行数：0</div>
+            <div id="features">特性：-</div>
+        </div>
+    </div>
+
+    <script>
+        const BASE_URL = 'http://localhost:8081';
+        let renderTimeout;
+
+        // 初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            const textarea = document.getElementById('markdown-input');
+            
+            // 监听输入，自动渲染
+            textarea.addEventListener('input', function() {
+                updateInfo();
+                
+                // 防抖，500ms 后渲染
+                clearTimeout(renderTimeout);
+                renderTimeout = setTimeout(renderMarkdown, 500);
+            });
+            
+            // 初始信息更新
+            updateInfo();
+        });
+
+        // 插入文本
+        function insertText(before, after = '') {
+            const textarea = document.getElementById('markdown-input');
+            const start = textarea.selectionStart;
+            const end = textarea.selectionEnd;
+            const text = textarea.value;
+            
+            const selectedText = text.substring(start, end);
+            const newText = text.substring(0, start) + before + selectedText + after + text.substring(end);
+            
+            textarea.value = newText;
+            textarea.focus();
+            textarea.selectionStart = start + before.length;
+            textarea.selectionEnd = end + before.length;
+            
+            textarea.dispatchEvent(new Event('input'));
+        }
+
+        // 加载示例
+        function loadExample() {
+            const example = `# Spring Boot 教程
+
+## 简介
+
+Spring Boot 是一个用于创建 **Spring** 应用的框架，它简化了配置流程。
+
+### 主要特性
+
+- ✅ 自动配置
+- ✅ 起步依赖
+- ✅ 命令行界面
+- ✅ 生产就绪功能
+
+## 代码示例
+
+\`\`\`java
+@SpringBootApplication
+public class BlogApplication {
+    public static void main(String[] args) {
+        SpringApplication.run(BlogApplication.class, args);
+    }
+}
+\`\`\`
+
+## 表格示例
+
+| 特性 | 描述 |
+|------|------|
+| 简单 | 开箱即用 |
+| 快速 | 快速开发 |
+| 强大 | 生态系统完善 |
+
+## 引用
+
+> Spring Boot makes it easy to create stand-alone, production-grade Spring based Applications.
+
+## 链接
+
+访问 [Spring 官网](https://spring.io) 了解更多。
+
+![Spring Boot](https://spring.io/img/spring-boot.svg)
+`;
+            
+            document.getElementById('markdown-input').value = example;
+            example.dispatchEvent(new Event('input'));
+        }
+
+        // 更新信息
+        function updateInfo() {
+            const text = document.getElementById('markdown-input').value;
+            
+            document.getElementById('char-count').textContent = `字符数：${text.length}`;
+            document.getElementById('line-count').textContent = `行数：${text.split('\\n').length}`;
+            
+            const features = [];
+            if (text.includes('```')) features.push('代码块');
+            if (text.includes('|') && text.includes('\\n|')) features.push('表格');
+            if (text.includes('![')) features.push('图片');
+            if (text.match(/\\[[^\\]]+\\]\\([^)]+\\)/)) features.push('链接');
+            
+            document.getElementById('features').textContent = `特性：${features.join(', ') || '-'}`;
+        }
+
+        // 渲染 Markdown
+        async function renderMarkdown() {
+            const markdown = document.getElementById('markdown-input').value;
+            
+            if (!markdown.trim()) {
+                document.getElementById('preview-output').innerHTML = '';
+                return;
+            }
+            
+            try {
+                const response = await fetch(`${BASE_URL}/markdown/render`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ markdown })
+                });
+                
+                const result = await response.json();
+                
+                if (result.code === 200) {
+                    document.getElementById('preview-output').innerHTML = result.data.html;
+                } else {
+                    console.error('渲染失败:', result.msg);
+                }
+            } catch (error) {
+                console.error('请求失败:', error);
+            }
+        }
+    </script>
+</body>
+</html>

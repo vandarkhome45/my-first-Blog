@@ -1,0 +1,160 @@
+### 全局变量定义
+@baseUrl = http://localhost:8081
+
+#############################################
+### 搜索模块功能测试
+#############################################
+
+### 准备工作：先创建几篇测试博客
+
+### 创建测试博客 1
+POST {{baseUrl}}/blog
+Content-Type: application/json
+
+{
+  "title": "Spring Boot 入门教程",
+  "content": "Spring Boot 是一个用于创建 Spring 应用的框架，它简化了配置流程，让开发更加高效。本文将介绍 Spring Boot 的基本使用方法。",
+  "category": "Java",
+  "tags": "Spring Boot, Java, 框架，后端开发"
+}
+
+###
+
+### 创建测试博客 2
+POST {{baseUrl}}/blog
+Content-Type: application/json
+
+{
+  "title": "Java 多线程编程详解",
+  "content": "Java 多线程是 Java 编程中的重要部分，本文详细讲解了 Thread、Runnable、Callable 等多线程相关概念和实践。",
+  "category": "Java",
+  "tags": "Java, 多线程，并发编程，JUC"
+}
+
+###
+
+### 创建测试博客 3
+POST {{baseUrl}}/blog
+Content-Type: application/json
+
+{
+  "title": "Python 数据分析入门",
+  "content": "Python 是数据科学领域最流行的编程语言之一，本文将介绍如何使用 Python 进行基础的数据分析工作。",
+  "category": "Python",
+  "tags": "Python, 数据分析，数据科学"
+}
+
+###
+
+### 创建测试博客 4
+POST {{baseUrl}}/blog
+Content-Type: application/json
+
+{
+  "title": "Web 前端开发技术栈",
+  "content": "现代 Web 前端开发涉及 HTML、CSS、JavaScript 三大核心技术，以及 React、Vue 等流行框架。",
+  "category": "前端",
+  "tags": "Web, 前端，JavaScript, React"
+}
+
+###
+
+#############################################
+### 正式测试搜索功能
+#############################################
+
+### 测试 1: 全文搜索 - 搜索"Java"
+GET {{baseUrl}}/search?q=Java
+
+###
+
+### 测试 2: 全文搜索 - 搜索"Spring Boot"
+GET {{baseUrl}}/search?q=Spring%20Boot
+
+###
+
+### 测试 3: 全文搜索 - 搜索"编程"（内容匹配）
+GET {{baseUrl}}/search?q=编程
+
+###
+
+### 测试 4: 全文搜索 - 搜索不存在的关键词
+GET {{baseUrl}}/search?q=不存在的关键词
+
+###
+
+### 测试 5: 高级搜索 - 只搜索标题中包含"Java"的文章
+GET {{baseUrl}}/search/advanced?q=Java&scope=title
+
+###
+
+### 测试 6: 高级搜索 - 只搜索内容中包含"多线程"的文章
+GET {{baseUrl}}/search/advanced?q=多线程&scope=content
+
+###
+
+### 测试 7: 高级搜索 - 搜索全部（默认）
+GET {{baseUrl}}/search/advanced?q=Java&scope=all
+
+###
+
+### 测试 8: 按分类搜索 - Java 分类中搜索"框架"
+GET {{baseUrl}}/search/category/Java?q=框架
+
+###
+
+### 测试 9: 按分类搜索 - 查看 Java 分类的所有文章（不指定关键词）
+GET {{baseUrl}}/search/category/Java
+
+###
+
+### 测试 10: 按分类搜索 - Python 分类
+GET {{baseUrl}}/search/category/Python
+
+###
+
+### 测试 11: 关键词高亮
+POST {{baseUrl}}/search/highlight
+Content-Type: application/json
+
+{
+  "keyword": "Java",
+  "text": "Java 是一门优秀的编程语言，学习 Java 很有意义。"
+}
+
+###
+
+### 测试 12: 搜索建议（自动补全）
+GET {{baseUrl}}/search/suggest?q=Spr
+
+###
+
+### 测试 13: 搜索建议 - Ja 开头
+GET {{baseUrl}}/search/suggest?q=Ja
+
+###
+
+### 测试 14: 热门搜索排行
+GET {{baseUrl}}/search/popular
+
+###
+
+### 测试 15: 组合测试 - 前端分类中搜索"JavaScript"
+GET {{baseUrl}}/search/category/前端?q=JavaScript
+
+###
+
+### 测试 16: 空关键词处理
+GET {{baseUrl}}/search?q=
+
+###
+
+### 测试 17: 特殊字符搜索
+GET {{baseUrl}}/search?q=C++
+
+###
+
+### 测试 18: 大小写不敏感测试
+GET {{baseUrl}}/search?q=java
+
+###
