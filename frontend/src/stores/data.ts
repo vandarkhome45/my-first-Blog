@@ -3,7 +3,7 @@ import { reactive } from 'vue'
 import type { Article, Project, Skill, TimelineItem, Profile, Comment } from '@/types'
 
 export const useDataStore = defineStore('data', () => {
-  const profile = reactive<Profile>({
+  const defaultProfile: Profile = {
     name: 'GAO',
     avatar: '',
     title: '全栈开发工程师 / 嵌入式爱好者',
@@ -14,7 +14,19 @@ export const useDataStore = defineStore('data', () => {
     github: 'https://github.com/gao',
     qq: '123456789',
     wechat: 'gao_wechat'
-  })
+  }
+
+  function loadProfile(): Profile {
+    try {
+      const saved = localStorage.getItem('blog_profile')
+      if (saved) {
+        return { ...defaultProfile, ...JSON.parse(saved) }
+      }
+    } catch {}
+    return { ...defaultProfile }
+  }
+
+  const profile = reactive<Profile>(loadProfile())
 
   const skills = reactive<Skill[]>([
     { name: 'C', category: 'embedded', level: 85 },
@@ -165,6 +177,7 @@ export const useDataStore = defineStore('data', () => {
   // ================= Profile =================
   function updateProfile(data: Partial<Profile>) {
     Object.assign(profile, data)
+    localStorage.setItem('blog_profile', JSON.stringify({ ...profile }))
   }
 
   // ================= Skills =================
