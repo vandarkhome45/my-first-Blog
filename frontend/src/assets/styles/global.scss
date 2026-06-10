@@ -1,0 +1,164 @@
+@use 'variables' as *;
+
+*,
+*::before,
+*::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: $font-sans;
+  background: $bg-primary;
+  color: $text-primary;
+  line-height: 1.7;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+}
+
+a {
+  color: $text-secondary;
+  text-decoration: none;
+  transition: color $transition;
+
+  &:hover {
+    color: $accent;
+  }
+}
+
+img {
+  max-width: 100%;
+  display: block;
+}
+
+::selection {
+  background: rgba($accent, 0.3);
+  color: $text-primary;
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: $bg-primary;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba($text-secondary, 0.2);
+  border-radius: 3px;
+
+  &:hover {
+    background: rgba($accent, 0.4);
+  }
+}
+
+// Section 通用样式
+.section {
+  padding: $gap-3xl 0;
+}
+
+.section-title {
+  font-size: 28px;
+  font-weight: 700;
+  margin-bottom: $gap-xl;
+  position: relative;
+  display: inline-block;
+
+  &::after {
+    content: '';
+    position: absolute;
+    bottom: -6px;
+    left: 0;
+    width: 40px;
+    height: 3px;
+    background: $accent;
+    border-radius: 2px;
+  }
+}
+
+// 页面容器
+.page-container {
+  @include container;
+  padding-top: 80px;
+  min-height: 100vh;
+}
+
+// 粒子背景
+#particles-bg {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0.15;
+}
+
+// 网格背景
+.grid-bg {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  pointer-events: none;
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+  background-size: 60px 60px;
+  mask-image: radial-gradient(ellipse at center, black 30%, transparent 70%);
+}
+
+// 内容需要在网格上方
+.content-layer {
+  position: relative;
+  z-index: 1;
+}
+
+// 卡片基础样式
+.card-style {
+  @include card;
+  padding: $gap-lg;
+}
+
+// 标签
+.tag {
+  display: inline-block;
+  padding: 2px 10px;
+  background: rgba($accent, 0.1);
+  color: $accent;
+  border: 1px solid rgba($accent, 0.2);
+  border-radius: $radius-sm;
+  font-size: 12px;
+  font-family: $font-mono;
+  letter-spacing: 0.5px;
+  transition: all $transition;
+
+  &:hover {
+    background: rgba($accent, 0.2);
+    border-color: $accent;
+  }
+}
+
+// 动画
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-in {
+  animation: fadeInUp 0.6s $transition both;
+}
